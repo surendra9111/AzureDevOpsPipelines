@@ -10,6 +10,6 @@ provider "azurerm" {
 }
 
 resource "azurerm_resource_group" "rg" {
-  name     = "SurendraRG-test-tbd-4"
+  name     = "SurendraRG-test-tbd-2"
   location = "westeurope"
 }
