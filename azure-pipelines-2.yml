@@ -9,6 +9,14 @@ trigger:
 pool:
   vmImage: ubuntu-latest
 
+variables:
+  subscription: Free Trial(2da48e21-7c15-4a47-8398-e05f5c1f53cc)
+  resourceGroup: surendraRG
+  storageAccount: storagesu6494933
+  container: containersu
+  tfstateFile: terraform.tfstate
+  anyTfChanges: false
+
 steps:
 
 - task: TerraformInstaller@0
@@ -22,11 +30,11 @@ steps:
     provider: 'azurerm'
     command: 'init'
     workingDirectory: '$(System.DefaultWorkingDirectory)/skip-step'
-    backendServiceArm: '$(2da48e21-7c15-4a47-8398-e05f5c1f53cc)'
-    backendAzureRmResourceGroupName: '$(surendraRG)'
-    backendAzureRmStorageAccountName: '$(storagesu6494933)'
-    backendAzureRmContainerName: '$(containersu)'
-    backendAzureRmKey: '$(terraform.tfstate)'
+    backendServiceArm: '$(subscription)'
+    backendAzureRmResourceGroupName: '$(resourceGroup)'
+    backendAzureRmStorageAccountName: '$(storageAccount)'
+    backendAzureRmContainerName: '$(container)'
+    backendAzureRmKey: '$(tfstateFile)'
 
 - task: TerraformTaskV1@0
   displayName: terraform plan -out=tfplan
@@ -36,20 +44,12 @@ steps:
     workingDirectory: '$(System.DefaultWorkingDirectory)/skip-step'
     commandOptions: '-out=tfplan'
     # commandOptions: '-detailed-exitcode -out=tfplan'
-    environmentServiceNameAzureRM: '$(2da48e21-7c15-4a47-8398-e05f5c1f53cc)'
+    environmentServiceNameAzureRM: '$(subscription)'
 
 - task: PowerShell@2
   displayName: detect any terraform change
   inputs:
-    workingDirectory: '- task: Terraform@2
-  inputs:
-    TemplatePath: '$(System.DefaultWorkingDirectory)/skip-step'
-    Arguments: 'init'
-    InstallTerraform: true
-    UseAzureSub: true
-    ConnectedServiceNameSelector: 'ConnectedServiceNameARM'
-    ConnectedServiceNameARM: 'Free Trial (2da48e21-7c15-4a47-8398-e05f5c1f53cc)'
-    ManageState: false'
+    workingDirectory: '$(System.DefaultWorkingDirectory)/skip-step'
     targetType: 'inline'
     script: |
       # Write-Host "LASTEXITCODE : $LASTEXITCODE"
@@ -74,4 +74,4 @@ steps:
     command: 'apply'
     workingDirectory: '$(System.DefaultWorkingDirectory)/skip-step'
     commandOptions: 'tfplan'
-    environmentServiceNameAzureRM: '$(2da48e21-7c15-4a47-8398-e05f5c1f53cc)'
+    environmentServiceNameAzureRM: '$(subscription)'
