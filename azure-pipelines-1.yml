@@ -10,6 +10,12 @@ pool:
   vmImage: ubuntu-latest
 
 steps:
+
+- task: TerraformInstaller@0
+  displayName: install Terraform v0.12.28
+  inputs:
+    terraformVersion: '0.12.28'
+
 - task: TerraformTaskV1@0
   displayName: terraform init
   inputs:
@@ -35,7 +41,15 @@ steps:
 - task: PowerShell@2
   displayName: detect any terraform change
   inputs:
-    workingDirectory: '$(System.DefaultWorkingDirectory)/skip-step'
+    workingDirectory: '- task: Terraform@2
+  inputs:
+    TemplatePath: '$(System.DefaultWorkingDirectory)/skip-step'
+    Arguments: 'init'
+    InstallTerraform: true
+    UseAzureSub: true
+    ConnectedServiceNameSelector: 'ConnectedServiceNameARM'
+    ConnectedServiceNameARM: 'Free Trial (2da48e21-7c15-4a47-8398-e05f5c1f53cc)'
+    ManageState: false'
     targetType: 'inline'
     script: |
       # Write-Host "LASTEXITCODE : $LASTEXITCODE"
